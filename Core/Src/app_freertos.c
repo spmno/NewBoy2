@@ -70,6 +70,15 @@ const osThreadAttr_t gps_task_attributes = {
   .stack_size = 128 * 4
 };
 void gps_task(void *argument);
+
+osThreadId_t at_task_handle;
+const osThreadAttr_t at_task_attributes = {
+  .name = "at_task",
+  .priority = (osPriority_t) osPriorityHigh,
+  .stack_size = 128 * 4
+};
+void at_task(void *argument);
+
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -185,6 +194,13 @@ void gps_task(void *argument)
 		}
 	}
 
+}
+
+void at_task(void *argument) 
+{
+	while(1) {
+		osThreadFlagsWait(GPS_DATA_FLAG, osFlagsWaitAny, osWaitForever);
+	}
 }
 /* USER CODE END Application */
 

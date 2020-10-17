@@ -528,23 +528,17 @@ void gpsinfo_callback()
 	
 	// 清除空闲中断标志（否则会一直不断进入中断）
 	__HAL_UART_CLEAR_IDLEFLAG(&huart1);
-    temp = huart1.Instance->ISR;
-    temp = huart1.Instance->RDR;
-    
+
 	// 停止本次DMA传输
     HAL_UART_DMAStop(&huart1);
-	temp=hdma_usart1_rx.Instance->CNDTR;
-	//__HAL_DMA_DISABLE((&huart1)->hdmarx);
-	
 
     // 计算接收到的数据长度
     rx_data_length  = GPS_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx);
 
 	printf("receive length = %d\n", rx_data_length);
 	
-	if((&huart1)->ErrorCode&HAL_UART_ERROR_ORE)
-	{
-		printf("--------------ore-----------");
+	if((&huart1)->ErrorCode&HAL_UART_ERROR_ORE)	{
+		printf("--------------ore1-----------");
 		__HAL_UART_CLEAR_OREFLAG((&huart1));
 	}
 	
@@ -563,6 +557,45 @@ void gpsinfo_callback()
     HAL_UART_Receive_DMA(&huart1, (uint8_t*)usart1_buffer, GPS_BUFFER_SIZE);
 
 }
+
+void atinfo_callback()
+{
+	uint16_t rx_data_length;
+	uint32_t temp;
+	if(RESET == __HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE))
+	{	 // 判断是否是空闲中断
+		return;
+	}
+	
+	// 清除空闲中断标志（否则会一直不断进入中断）
+	__HAL_UART_CLEAR_IDLEFLAG(&huart3);  
+	// 停止本次DMA传输
+    HAL_UART_DMAStop(&huart3);
+    // 计算接收到的数据长度
+    rx_data_length  = GPS_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(&hdma_usart3_rx);
+	printf("3receive length = %d\n", rx_data_length);
+	
+	if((&huart3)->ErrorCode&HAL_UART_ERROR_ORE) {
+		printf("--------------ore3-----------");
+		__HAL_UART_CLEAR_OREFLAG((&huart3));
+	}
+	
+	if (rx_data_length >= GPS_BUFFER_SIZE) {
+      HAL_UART_Receive_DMA(&huart3, (uint8_t*)usart3_buffer, BUFFER_SIZE);
+	  return;
+	}
+
+	if (at_task_handle == 0) 
+		return;
+	usart3_buffer[rx_data_length]=0;
+	printf("at id = %x\n", at_task_handle);
+	osThreadFlagsSet(gps_task_handle, AT_DATA_FLAG);
+	// 重启开始DMA传输 每次255字节数据
+	//__HAL_DMA_ENABLE((&huart1)->hdmarx);
+    HAL_UART_Receive_DMA(&huart3, (uint8_t*)usart3_buffer, BUFFER_SIZE);
+
+}
+
 
 #ifdef __GNUC__
 

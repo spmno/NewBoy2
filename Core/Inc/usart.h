@@ -36,6 +36,15 @@ extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN Private defines */
+#define BUFFER_SIZE 256
+#define GPS_BUFFER_SIZE	1024
+extern uint8_t lpuart1_buffer[BUFFER_SIZE];
+extern uint8_t usart1_buffer[GPS_BUFFER_SIZE];
+extern uint8_t usart3_buffer[BUFFER_SIZE];
+extern uint8_t uart4_buffer[BUFFER_SIZE];
+
+void gpsinfo_callback(void);
+void USER_UART_IDLECallback(UART_HandleTypeDef *huart, DMA_HandleTypeDef *hdma_uart, uint8_t *buffer);
 
 /* USER CODE END Private defines */
 
@@ -45,14 +54,7 @@ void MX_USART1_UART_Init(void);
 void MX_USART3_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-#define BUFFER_SIZE 512
-#define GPS_BUFFER_SIZE 1024
-extern uint8_t lpuart1_buffer[BUFFER_SIZE];
-extern uint8_t usart1_buffer[GPS_BUFFER_SIZE];
-extern uint8_t usart3_buffer[BUFFER_SIZE];
-extern uint8_t uart4_buffer[BUFFER_SIZE];
-void USER_UART_IDLECallback(UART_HandleTypeDef *huart, DMA_HandleTypeDef *hdma_uart, uint8_t *buffer);
-void gpsinfo_callback(void);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : USART.h
+  * File Name          : RTC.h
   * Description        : This file provides code for the configuration
-  *                      of the USART instances.
+  *                      of the RTC instances.
   ******************************************************************************
   * @attention
   *
@@ -17,8 +17,8 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __usart_H
-#define __usart_H
+#ifndef __rtc_H
+#define __rtc_H
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -30,29 +30,13 @@
 
 /* USER CODE END Includes */
 
-extern UART_HandleTypeDef hlpuart1;
-extern UART_HandleTypeDef huart4;
-extern UART_HandleTypeDef huart1;
-extern UART_HandleTypeDef huart3;
+extern RTC_HandleTypeDef hrtc;
 
 /* USER CODE BEGIN Private defines */
-#define BUFFER_SIZE 256
-#define GPS_BUFFER_SIZE	1024
-#define AT_BUFFER_SIZE	1024
-extern uint8_t lpuart1_buffer[BUFFER_SIZE];
-extern uint8_t usart1_buffer[GPS_BUFFER_SIZE];
-extern uint8_t usart3_buffer[AT_BUFFER_SIZE];
-extern uint8_t uart4_buffer[BUFFER_SIZE];
-
-void gpsinfo_callback(void);
-void USER_UART_IDLECallback(UART_HandleTypeDef *huart, DMA_HandleTypeDef *hdma_uart, uint8_t *buffer);
 
 /* USER CODE END Private defines */
 
-void MX_LPUART1_UART_Init(void);
-void MX_UART4_Init(void);
-void MX_USART1_UART_Init(void);
-void MX_USART3_UART_Init(void);
+void MX_RTC_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -61,7 +45,7 @@ void MX_USART3_UART_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ usart_H */
+#endif /*__ rtc_H */
 
 /**
   * @}

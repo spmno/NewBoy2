@@ -26,7 +26,7 @@
 
 uint8_t lpuart1_buffer[BUFFER_SIZE];
 uint8_t usart1_buffer[GPS_BUFFER_SIZE];
-uint8_t usart3_buffer[BUFFER_SIZE];
+uint8_t usart3_buffer[AT_BUFFER_SIZE];
 uint8_t uart4_buffer[BUFFER_SIZE];
 /* USER CODE END 0 */
 
@@ -384,7 +384,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_NVIC_EnableIRQ(USART3_IRQn);
   /* USER CODE BEGIN USART3_MspInit 1 */
     __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
-    HAL_UART_Receive_DMA(&huart3, usart3_buffer, BUFFER_SIZE);
+    HAL_UART_Receive_DMA(&huart3, usart3_buffer, AT_BUFFER_SIZE);
     __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_TC);				//关闭DMA中断
   /* USER CODE END USART3_MspInit 1 */
   }
@@ -580,8 +580,8 @@ void atinfo_callback()
 		__HAL_UART_CLEAR_OREFLAG((&huart3));
 	}
 	
-	if (rx_data_length >= GPS_BUFFER_SIZE) {
-      HAL_UART_Receive_DMA(&huart3, (uint8_t*)usart3_buffer, BUFFER_SIZE);
+	if (rx_data_length >= AT_BUFFER_SIZE) {
+      HAL_UART_Receive_DMA(&huart3, (uint8_t*)usart3_buffer, AT_BUFFER_SIZE);
 	  return;
 	}
 
@@ -592,7 +592,7 @@ void atinfo_callback()
 	osThreadFlagsSet(gps_task_handle, AT_DATA_FLAG);
 	// 重启开始DMA传输 每次255字节数据
 	//__HAL_DMA_ENABLE((&huart1)->hdmarx);
-    HAL_UART_Receive_DMA(&huart3, (uint8_t*)usart3_buffer, BUFFER_SIZE);
+    HAL_UART_Receive_DMA(&huart3, (uint8_t*)usart3_buffer, AT_BUFFER_SIZE);
 
 }
 

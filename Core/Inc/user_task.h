@@ -2,7 +2,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "cmsis_os.h"
-#define GPS_DATA_FLAG	1U
+#define GPS_DATA_FLAG	8U
 #define AT_DATA_FLAG	1U
 #define AT_IDLE_FLAG	2U
 #define AT_RESET_FLAG	4U

@@ -42,20 +42,43 @@ void set_ip_address(const char* ip_address_para)
 	printf("set ip: %s\n", ip_address);
 }
 
-
 _Bool get_token_from_buffer(const char* buffer)
 {
+	printf("get_token_from_buffer\n");
+	char *token_str = "\"access_token\"";
+	const char* token_position = strstr(buffer, token_str);
+	if (NULL == token_position) {
+		printf("not found { \n");
+		return false;
+	}
+	const char* token_end_posiont = token_position+strlen(token_str)+1;
+	const char* start_dqmark_position = strchr(token_end_posiont, '"') + 1;
+	const char* end_dqmark_position = strchr(start_dqmark_position+1, '"');
+	strncpy(access_token, start_dqmark_position, end_dqmark_position-start_dqmark_position);
+	printf("access_token:%s\n", access_token);
+	return true;
+}
+/*
+_Bool get_token_from_buffer(const char* buffer)
+{
+	printf("get_token_from_buffer\n");
 	const char* left_brace_position = strstr(buffer, "{");
 	if (NULL == left_brace_position) {
+		printf("not found { \n");
 		return false;
 	}
 	const char* right_brace_position = strstr(buffer, "}");
 		if (NULL == left_brace_position) {
+		printf("not found } \n");
 		return false;
 	}
 	
-	char token_json_buffer[256];
+	char *token_json_buffer = (char*)malloc(256);
+	if(NULL == token_json_buffer) {
+		printf("malloc error!");
+	}
 	strncpy(token_json_buffer, left_brace_position, right_brace_position-left_brace_position+1);
+	printf("token:%s\n", token_json_buffer);
 	cJSON* root = cJSON_Parse(token_json_buffer);
 	if (!root) {
 		printf("Error before: [%s]\n",cJSON_GetErrorPtr());
@@ -66,7 +89,28 @@ _Bool get_token_from_buffer(const char* buffer)
 		printf("Error before: [%s]\n",cJSON_GetErrorPtr());
 	}
 	
-	strcpy(access_token, access_token_item->string);
+	cJSON* refresh_token_item = cJSON_GetObjectItem(root, "refresh_token");
+	if (!refresh_token_item) {
+		printf("Error before: [%s]\n",cJSON_GetErrorPtr());
+	}
+	
+	strcpy(access_token, access_token_item->valuestring);
+	strcpy(refresh_token, refresh_token_item->valuestring);
+	printf("access_token:%s, refresh_token:%s\n", access_token, refresh_token);
+	cJSON_Delete(root);
+	free(token_json_buffer);
 	return true;
 }
+*/
+_Bool get_result_from_buffer(const char* buffer)
+{
+	printf("get_result_from_buffer\n");
+	return true;
+}
+
+char* get_access_token(void)
+{
+	return access_token;
+}
+
 

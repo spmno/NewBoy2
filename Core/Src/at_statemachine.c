@@ -5,6 +5,7 @@
 #include "string.h"
 #include "user_task.h"
 #include "utils.h"
+#include "data_saver.h"
 
 #define AT_TRANSMIT_TIME	200
 
@@ -60,6 +61,25 @@ action_result at_httptoken_action2(const char *command_buffer);
 int at_readtoken_action1(void);
 action_result at_readtoken_action2(const char *command_buffer);
 
+//configure url for update
+int at_httpurl1_action1(void);
+action_result at_httpurl1_action2(const char *command_buffer);
+
+//configure the update url address
+int at_httpurl1_add_action1(void);
+action_result at_httpurl1_add_action2(const char *command_buffer);
+
+//post bike data command
+int at_httppost1_action1(void);
+action_result at_httppost1_action2(const char *command_buffer);
+
+int at_httpupload_action1(void);
+action_result at_httpupload_action2(const char *command_buffer);
+		
+int at_readresult_action1(void);
+action_result at_readresult_action2(const char *command_buffer);
+
+
 int send_data_action1(void);
 action_result send_data_action2(const char *command_buffer);
 
@@ -76,21 +96,26 @@ static int current_state_index = 0;
 static const nbiot_fsm_state_t nbiot_state_list[] =
 {
 	//{STATE_HAL_RESET,				STATE_AT, 	         		1,  3000, 	at_reset_action1, 					at_reset_action2		},
-	{STATE_AT,       				STATE_CPIN,				 			3,  3000,		at_action1,         				at_action2         	},
-	{STATE_CPIN,     				STATE_CREG,	 						3,  10000,	at_pin_action1,       			at_pin_action2     	},
-	{STATE_CREG,						STATE_CGREG,		 				3,  30000,	at_creg_action1,  					at_creg_action2  		},
-	{STATE_CGREG,						STATE_QICSGP,		 				3,  30000,	at_cgreg_action1, 	 				at_cgreg_action2  	},
-	{STATE_QICSGP,					STATE_QIACT,		 				3,  1000,		at_csgp_action1,  					at_csgp_action2  		},
-	{STATE_QIACT,						STATE_QIACT_RESULT,		 	3,  1000,		at_act_action1,  						at_act_action2  		},
-	{STATE_QIACT_RESULT,		STATE_QHTTPCFG_CONTEXT,	3,  1000,		at_query_act_action1, 			at_query_act_action2},
-	{STATE_QHTTPCFG_CONTEXT,STATE_QHTTPREQ_HEADER,	5,  3000,		at_httpcfg_context_action1, at_httpcfg_context_action2},
-	{STATE_QHTTPREQ_HEADER,	STATE_QHTTPURL,					5,  3000,		at_httpcfg_header_action1, 	at_httpcfg_header_action2},
-	{STATE_QHTTPURL,				STATE_QHTTPURL_CONTENT,	5,  3000,		at_httpurl_action1, 				at_httpurl_action2},
-	{STATE_QHTTPURL_CONTENT,STATE_QHTTPPOST,				5,  3000,		at_httpurl_add_action1, 		at_httpurl_add_action2},
-	{STATE_QHTTPPOST,				STATE_REQUEST_TOKEN,		5,  3000,		at_httppost_action1, 				at_httppost_action2},
-	{STATE_REQUEST_TOKEN,		STATE_READ_TOKEN,				5,  3000,		at_httptoken_action1, 			at_httptoken_action2},
-	{STATE_READ_TOKEN,			STATE_SEND_DATA,				5,  3000,		at_readtoken_action1, 			at_readtoken_action2},
-	{STATE_IDEL,     				STATE_IDEL,      				100,3000,		state_idel_action1, 				state_idel_action2 	},
+	{STATE_AT,       				STATE_CPIN,				 	3,  3000,	1000, at_action1,         				at_action2         	},
+	{STATE_CPIN,     				STATE_CREG,	 				3,  10000,	1000, at_pin_action1,       			at_pin_action2     	},
+	{STATE_CREG,					STATE_CGREG,		 		3,  30000,	1000, at_creg_action1,  					at_creg_action2  		},
+	{STATE_CGREG,					STATE_QICSGP,		 		3,  30000,	1000, at_cgreg_action1, 	 				at_cgreg_action2  	},
+	{STATE_QICSGP,					STATE_QIACT,		 		3,  1000,	1000, at_csgp_action1,  					at_csgp_action2  		},
+	{STATE_QIACT,					STATE_QIACT_RESULT,		 	3,  1000,	1000, at_act_action1,  						at_act_action2  		},
+	{STATE_QIACT_RESULT,			STATE_QHTTPCFG_CONTEXT,		3,  1000,	1000, at_query_act_action1, 			at_query_act_action2},
+	{STATE_QHTTPCFG_CONTEXT,		STATE_QHTTPREQ_HEADER,		5,  3000,	1000, at_httpcfg_context_action1, at_httpcfg_context_action2},
+	{STATE_QHTTPREQ_HEADER,			STATE_QHTTPURL,				5,  3000,	1000, at_httpcfg_header_action1, 	at_httpcfg_header_action2},
+	{STATE_QHTTPURL,				STATE_QHTTPURL_CONTENT,		5,  3000,	1000, at_httpurl_action1, 				at_httpurl_action2},
+	{STATE_QHTTPURL_CONTENT,		STATE_QHTTPPOST,			5,  3000,	1000, at_httpurl_add_action1, 		at_httpurl_add_action2},
+	{STATE_QHTTPPOST,				STATE_REQUEST_TOKEN,		5,  3000,	1000, at_httppost_action1, 				at_httppost_action2},
+	{STATE_REQUEST_TOKEN,			STATE_READ_TOKEN,			5,  3000,	1000, at_httptoken_action1, 			at_httptoken_action2},
+	{STATE_READ_TOKEN,				STATE_QHTTPURL1,			5,  3000,	1000, at_readtoken_action1, 			at_readtoken_action2},
+	{STATE_QHTTPURL1,				STATE_QHTTPURL_CONTENT1,	5,  3000,	1000, at_httpurl1_action1, 				at_httpurl1_action2},
+	{STATE_QHTTPURL_CONTENT1,		STATE_QHTTPPOST1,			5,  3000,	1000, at_httpurl1_add_action1, 		at_httpurl1_add_action2},
+	{STATE_QHTTPPOST1,				STATE_UPLOAD_INFO,			5,  3000,	1000, at_httppost1_action1, 				at_httppost1_action2},
+	{STATE_UPLOAD_INFO,				STATE_READ_RESULT,			5,  3000,	1000, at_httpupload_action1, 			at_httpupload_action2},
+	{STATE_READ_RESULT,				STATE_QHTTPPOST1,			5,  3000,	3000, at_readresult_action1, 			at_readresult_action2},
+
 };
 
 nbiot_fsm_state_index_t* get_current_state_index()
@@ -109,7 +134,7 @@ void init_at_statemachine()
 
 void jump_to_next_at_statemachine() 
 {
-	++current_state_index;
+	current_state_index = nbiot_fsm_state_index.fsm_state->next_state;
 	nbiot_fsm_state_index.cur_state = nbiot_state_list[current_state_index].cur_state;
 	nbiot_fsm_state_index.init = 1;
 	nbiot_fsm_state_index.trycnt = 0;
@@ -222,10 +247,13 @@ int at_csgp_action1(void)
 action_result at_csgp_action2(const char *command_buffer)
 {
 	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
+		printf("at_csgp_action2 s\n");
 		return ACTION_SUCCESS;
 	} if(isCorrectCommand(command_buffer, "AT+QICSGP=1") == SUCCESS) {
+		printf("at_csgp_action2 a\n");
 		return ACTION_WAIT_AGAIN;;
 	} else {
+		printf("at_csgp_action2 f\n");
 		return ACTION_FAILED;
 	}
 }
@@ -274,6 +302,7 @@ action_result at_query_act_action2(const char *command_buffer)
 //configure parameters for https server
 int at_httpcfg_context_action1(void)
 {
+	printf("send command AT+QHTTPCFG context\n");
 	send_at_command("AT+QHTTPCFG=\"contextid\",1\r\n");
 	return 0;
 }
@@ -291,6 +320,7 @@ action_result at_httpcfg_context_action2(const char *command_buffer)
 //configure parameters for https header
 int at_httpcfg_header_action1(void)
 {
+	printf("send command AT+QHTTPCFG header\n");
 	send_at_command("AT+QHTTPCFG=\"requestheader\",1\r\n");
 	return 0;
 }
@@ -308,6 +338,7 @@ action_result at_httpcfg_header_action2(const char *command_buffer)
 //configure url for https server
 int at_httpurl_action1(void)
 {
+	printf("send command AT+QHTTPURL\n");
 	send_at_command("AT+QHTTPURL=32,80\r\n");
 	return 0;
 }
@@ -324,6 +355,7 @@ action_result at_httpurl_action2(const char *command_buffer)
 //configure the url address
 int at_httpurl_add_action1(void)
 {
+	printf("send url content\n");
 	send_at_command("http://39.107.84.155/oauth/token");
 	return 0;
 }
@@ -340,6 +372,7 @@ action_result at_httpurl_add_action2(const char *command_buffer)
 //post at command
 int at_httppost_action1(void)
 {
+	printf("send command AT+QHTTPPOST\n");
 	send_at_command("AT+QHTTPPOST=266,80,80\r\n");
 	return 0;
 }
@@ -355,6 +388,7 @@ action_result at_httppost_action2(const char *command_buffer)
 
 int at_httptoken_action1(void)
 {
+	printf("send post data\n");
 	char* send_data = "POST /oauth/token HTTP/1.1\r\nHost: 39.107.84.155\r\nContent-Type: application/json\r\nContent-Length: 162\r\n\r\n{\"grant_type\":\"password\",\"username\":\"test\",\"password\":\"c70d12b4f791674b70b2\",\"client_id\":\"cb7fc9c8\",\"client_secret\":\"YyeEJfISMYMKZ6gsAyLkQwdhp6YEIQdCrPZohWz9OO4\"}";
 	send_at_command(send_data);
 	return 0;
@@ -378,6 +412,8 @@ action_result at_httptoken_action2(const char *command_buffer)
 //read token command
 int at_readtoken_action1(void)
 {
+	printf("send command http reader\n");
+	HAL_Delay(100);
 	send_at_command("AT+QHTTPREAD=80\r\n");
 	return 0;
 }
@@ -385,13 +421,121 @@ int at_readtoken_action1(void)
 action_result at_readtoken_action2(const char *command_buffer)
 {
 	if (isCorrectCommand(command_buffer, "CONNECT") == SUCCESS) {
-		get_token_from_buffer(command_buffer);
+		if(get_token_from_buffer(command_buffer)) {
+			return ACTION_SUCCESS;
+		}
+	}
+	
+	return ACTION_FAILED;
+}
+
+//configure url for update
+int at_httpurl1_action1(void)
+{
+	printf("send command AT+QHTTPURL1\n");
+	send_at_command("AT+QHTTPURL=52,80\r\n");
+	return 0;
+}
+
+action_result at_httpurl1_action2(const char *command_buffer)
+{
+	if (isCorrectCommand(command_buffer, "CONNECT") == SUCCESS) {
 		return ACTION_SUCCESS;
 	} else {
 		return ACTION_FAILED;
 	}
 }
 
+//configure the update url address
+int at_httpurl1_add_action1(void)
+{
+	printf("send url1 content\n");
+	send_at_command("http://39.107.84.155/api/v1/bikes/upload/20201027001");
+	return 0;
+}
+
+action_result at_httpurl1_add_action2(const char *command_buffer)
+{
+	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
+		return ACTION_SUCCESS;
+	} else {
+		return ACTION_FAILED;
+	}
+}
+
+//post bike data command
+static char send_data[512];
+int at_httppost1_action1(void)
+{
+	char post_buffer[32];
+	int post_len = 0;
+	printf("send command AT+QHTTPPOST1\n");
+	gps_info *gps_info_pointer = get_gps_info();
+	sprintf(send_data, "POST /api/v1/bikes/upload/20201027001 HTTP/1.1\r\nHost: 39.107.84.155\r\nContent-Type: application/json\r\nContent-Length: 58\r\nAuthorization: Bearer %s\r\n\r\n{\"longitude\":\"%0.4f\",\"latitude\":\"%0.4f\",\"diag_info\":{}}", 
+			get_access_token(), 
+			gps_info_pointer->longitude,
+			gps_info_pointer->latitude);
+	post_len = strlen(send_data);
+	sprintf(post_buffer, "AT+QHTTPPOST=%d,80,80\r\n", post_len);
+	send_at_command(post_buffer);
+	printf("len=%d\n", post_len);
+	return 0;
+}
+
+action_result at_httppost1_action2(const char *command_buffer)
+{
+	if (isCorrectCommand(command_buffer, "CONNECT") == SUCCESS) {
+		return ACTION_SUCCESS;
+	} else {
+		return ACTION_FAILED;
+	}
+}
+
+
+int at_httpupload_action1(void)
+{
+	printf("send upload %s\n", send_data);
+	HAL_Delay(100);
+	send_at_command(send_data);
+	return 0;
+}
+
+action_result at_httpupload_action2(const char *command_buffer)
+{
+	if (isCorrectCommand(command_buffer, "QHTTPPOST") == SUCCESS) {
+		if (isCorrectCommand(command_buffer, "201") == SUCCESS) {
+			printf("action2 success\n");
+			return ACTION_SUCCESS;
+		} else {
+			printf("action2 failed\n");
+			return ACTION_FAILED;
+		}
+	} else if(isCorrectCommand(command_buffer, "OK") == SUCCESS) {
+		printf("action2 again\n");
+		return ACTION_WAIT_AGAIN;;
+	} else {
+		printf("action2 failed\n");
+		return ACTION_FAILED;
+	}
+}
+
+
+int at_readresult_action1()
+{
+	printf("send command result reader\n");
+	send_at_command("AT+QHTTPREAD=80\r\n");
+	return 0;
+}
+
+action_result at_readresult_action2(const char *command_buffer)
+{	
+	if ((isCorrectCommand(command_buffer, "CONNECT") == SUCCESS) || isCorrectCommand(command_buffer, "QHTTPREAD") == SUCCESS) {
+		get_result_from_buffer(command_buffer);
+		return ACTION_SUCCESS;
+	} else {
+		return ACTION_FAILED;
+	}
+}
 
 
 int send_data_action1()
@@ -401,11 +545,14 @@ int send_data_action1()
 
 action_result send_data_action2(const char *command_buffer)
 {
+	
 	return ACTION_SUCCESS;
 }
 
 int state_idel_action1()
 {
+	printf("upload date.\n");
+	
 	return 0;
 }
 
@@ -437,7 +584,5 @@ void send_at_command(char *data)
     LL_USART_TransmitData8(USART3,(uint8_t)(*data & (uint8_t)0xff));//·¢ËÍÊý¾Ý
     data++;
   }
-  HAL_Delay(1000);
- 
 }
 

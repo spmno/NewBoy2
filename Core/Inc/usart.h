@@ -32,11 +32,13 @@
 
 /* USER CODE BEGIN Private defines */
 #define BUFFER_SIZE 256
-#define GPS_BUFFER_SIZE	1024
+#define GPS_BUFFER_SIZE	768
 #define AT_BUFFER_SIZE	512
-extern uint8_t lpuart1_buffer[BUFFER_SIZE];
+#define MINIMUM_LENGTH	4
+//extern uint8_t lpuart1_buffer[BUFFER_SIZE];
 extern uint8_t usart1_buffer[GPS_BUFFER_SIZE];
 extern uint8_t usart3_buffer[AT_BUFFER_SIZE];
+extern uint8_t at_buffer[AT_BUFFER_SIZE];
 extern uint8_t uart4_buffer[BUFFER_SIZE];
 
 void gpsinfo_callback(void);

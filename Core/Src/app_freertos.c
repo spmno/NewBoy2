@@ -34,6 +34,8 @@
 #include "minmea.h"
 #include "at_statemachine.h"
 #include "utils.h"
+#include "gpio.h"
+#include "data_saver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,7 +71,7 @@ osThreadId_t gps_task_handle;
 const osThreadAttr_t gps_task_attributes = {
   .name = "gps_task",
   .priority = (osPriority_t) osPriorityHigh,
-  .stack_size = 128 * 4
+  .stack_size = 128 * 6
 };
 void gps_task(void *argument);
 
@@ -77,8 +79,11 @@ osThreadId_t at_task_handle;
 const osThreadAttr_t at_task_attributes = {
   .name = "at_task",
   .priority = (osPriority_t) osPriorityHigh,
-  .stack_size = 128 * 4
+  .stack_size = 128 * 6
 };
+
+bool at_dealing_data = false;
+
 void at_task(void *argument);
 
 void reset_at_module(void); 
@@ -116,7 +121,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  //defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -148,15 +153,15 @@ void StartDefaultTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-char gps_buffer[GPS_BUFFER_SIZE];
-char gprmc_buffer[100];
-char gpgga_buffer[100];
+static char gps_buffer[GPS_BUFFER_SIZE];
+static char gprmc_buffer[100];
+static char gpgga_buffer[100];
 void gps_task(void *argument)
 {
 	while(1) {
 		osThreadFlagsWait(GPS_DATA_FLAG, osFlagsWaitAny, osWaitForever);
 		strcpy(gps_buffer, (char*)usart1_buffer);
-		printf("%s\n", gps_buffer);
+		//printf("%s\n", gps_buffer);
 		const char* gprmc_pointer = strstr(gps_buffer, "$GPRMC");
 		if (gprmc_pointer != NULL) {
 			const char* gprmc_end_pointer = strstr(gprmc_pointer, "\n");
@@ -165,7 +170,7 @@ void gps_task(void *argument)
 			strncpy(gprmc_buffer, gprmc_pointer, rmc_length);
 			struct minmea_sentence_rmc frame;
 			if (minmea_parse_rmc(&frame, gprmc_buffer)) {
-                    printf("$GPRMC: raw coordinates and speed: (%d/%d,%d/%d) %d/%d\n",
+                    /*printf("$GPRMC: raw coordinates and speed: (%d/%d,%d/%d) %d/%d\n",
                             frame.latitude.value, frame.latitude.scale,
                             frame.longitude.value, frame.longitude.scale,
                             frame.speed.value, frame.speed.scale);
@@ -177,11 +182,13 @@ void gps_task(void *argument)
 							frame.date.year, frame.date.month, frame.date.day,
                             frame.time.hours, frame.time.minutes, frame.time.seconds
 							);
+				*/
+					save_gps_info(frame.longitude.value, frame.latitude.value);
 
-                }
-                else {
-                    printf("$xxRMC sentence is not parsed\n");
-                }
+              }
+              else {
+                  printf("$xxRMC sentence is not parsed\n");
+              }
 		}
 		const char* gpgga_pointer = strstr(gps_buffer, "$GPGGA");
 		if (gpgga_pointer != NULL) {
@@ -197,8 +204,8 @@ void gps_task(void *argument)
                printf("$xxGGA sentence is not parsed\n");
             }
 		}
+		printf("number1=%d, %d, %d", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
 	}
-
 }
 
 void at_task(void *argument) 
@@ -219,8 +226,8 @@ void at_task(void *argument)
 		if (!wait_again) {
 			current_index_pointer = get_current_state_index();
 			current_index_pointer->fsm_state->action1();
+			HAL_Delay(500);
 			wait_time = current_index_pointer->fsm_state->wait_time;
-			wait_again = 0;
 		}
 		
 		wait_result = osThreadFlagsWait(AT_WAIT_FLAG, osFlagsWaitAny, wait_time);
@@ -239,23 +246,27 @@ void at_task(void *argument)
 			continue;
 		}
 		
-		const char* command = get_at_command_from_buffer((char*)usart3_buffer);
-		printf("buffer:%s\n", usart3_buffer);
-		action_result action2_result = current_index_pointer->fsm_state->action2(command);
+		//const char* command = get_at_command_from_buffer((char*)at_buffer);
+		printf("buffer:%s\n", at_buffer);
+		action_result action2_result = current_index_pointer->fsm_state->action2((char*)at_buffer);
+		
 		if (action2_result == ACTION_REPEAT) {
 			continue;
 		} else if (action2_result == ACTION_SUCCESS) {
+			wait_again = 0;
+			HAL_Delay(current_index_pointer->fsm_state->delay_time);
 			jump_to_next_at_statemachine(); 
 		} else if (action2_result == ACTION_WAIT_AGAIN) {
 			wait_again = 1;
 		}
-		
+		printf("number2=%d, %d, %d\n", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
 	}
 }
 
 void reset_at_module() 
 {
 	printf("reset at module\n");
+	reset_action();
 	init_at_statemachine();
 	osThreadFlagsSet(at_task_handle, AT_RESET_FLAG);
 }

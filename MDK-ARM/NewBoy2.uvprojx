@@ -335,9 +335,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_HAL_DRIVER,STM32G431xx</Define>
+              <Define>USE_HAL_DRIVER,STM32G431xx,USE_FULL_LL_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;     ../Drivers/STM32G4xx_HAL_Driver/Inc;     ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;     ../Middlewares/Third_Party/FreeRTOS/Source/include;     ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;     ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;     ../Drivers/CMSIS/Device/ST/STM32G4xx/Include;     ../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Core/Inc;              ../Drivers/STM32G4xx_HAL_Driver/Inc;              ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;              ../Middlewares/Third_Party/FreeRTOS/Source/include;              ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;              ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;              ../Drivers/CMSIS/Device/ST/STM32G4xx/Include;              ../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,9 +392,34 @@
           <GroupName>Application/User/Core</GroupName>
           <Files>
             <File>
+              <FileName>at_statemachine.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\at_statemachine.h</FilePath>
+            </File>
+            <File>
               <FileName>minmea.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\minmea.c</FilePath>
+            </File>
+            <File>
+              <FileName>at_statemachine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\at_statemachine.c</FilePath>
+            </File>
+            <File>
+              <FileName>hashmap.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\hashmap.h</FilePath>
+            </File>
+            <File>
+              <FileName>utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>cJSON.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\cJSON.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -427,6 +452,16 @@
               <FilePath>../Core/Src/usart.c</FilePath>
             </File>
             <File>
+              <FileName>rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/tim.c</FilePath>
+            </File>
+            <File>
               <FileName>stm32g4xx_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32g4xx_it.c</FilePath>
@@ -441,15 +476,45 @@
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32g4xx_hal_timebase_tim.c</FilePath>
             </File>
+            <File>
+              <FileName>data_saver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\data_saver.c</FilePath>
+            </File>
+            <File>
+              <FileName>data_saver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\data_saver.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Drivers/STM32G4xx_HAL_Driver</GroupName>
           <Files>
             <File>
+              <FileName>stm32g4xx_ll_utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_ll_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_exti.c</FilePath>
+            </File>
+            <File>
               <FileName>stm32g4xx_hal_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_ll_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_ll_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_dma.c</FilePath>
             </File>
             <File>
               <FileName>stm32g4xx_hal_fdcan.c</FileName>
@@ -517,14 +582,29 @@
               <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c</FilePath>
             </File>
             <File>
-              <FileName>stm32g4xx_hal_uart.c</FileName>
+              <FileName>stm32g4xx_ll_lpuart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c</FilePath>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_lpuart.c</FilePath>
             </File>
             <File>
-              <FileName>stm32g4xx_hal_uart_ex.c</FileName>
+              <FileName>stm32g4xx_ll_rcc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c</FilePath>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_ll_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_rtc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rtc_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32g4xx_hal_tim.c</FileName>
@@ -535,6 +615,11 @@
               <FileName>stm32g4xx_hal_tim_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_ll_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_ll_tim.c</FilePath>
             </File>
           </Files>
         </Group>

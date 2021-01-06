@@ -5,7 +5,7 @@ typedef enum
 {
   //STATE_HAL_RESET= 0x01,  /*reset module*/
 	STATE_AT,               /*send at command wait for response ok*/
-	STATE_CPIN,             /*query SIM card status£¬if failed to identify sim card in 20s, then reboot the module*/
+	STATE_CPIN,             /*query SIM card statusï¿½ï¿½if failed to identify sim card in 20s, then reboot the module*/
 	STATE_CREG,							/* query CS service, if failed to register on CS domain service in 90s, then reboot the module */
 	STATE_CGREG,						/* query PS service, if failed to register on PS domain service in 60s, then reboot the module */
 	STATE_QICSGP,						/* configure parameters of a tcp/ip context */
@@ -24,7 +24,7 @@ typedef enum
 	STATE_QHTTPPOST1,				/* send post request */
 	STATE_UPLOAD_INFO,	
 	STATE_READ_RESULT,
-	STATE_IDEL,             /*¿ÕÏÐ×´Ì¬*/  
+	STATE_IDEL,             /*ï¿½ï¿½ï¿½ï¿½×´Ì¬*/  
 	STATE_LENGTH,
 } nbiot_state_e;
 
@@ -39,22 +39,22 @@ typedef enum
 
 typedef struct 
 {
-    nbiot_state_e cur_state;    /*µ±Ç°×´Ì¬*/
-    nbiot_state_e next_state;   /*ÏÂÒ»¸ö×´Ì¬*/
-    int  try_cnt;               /*ÖØÊÔ´ÎÊý*/
-    int  wait_time;             /*µÈ´ýÊ±¼ä*/
+    nbiot_state_e cur_state;    /*ï¿½ï¿½Ç°×´Ì¬*/
+    nbiot_state_e next_state;   /*ï¿½ï¿½Ò»ï¿½ï¿½×´Ì¬*/
+    int  try_cnt;               /*ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½*/
+    int  wait_time;             /*ï¿½È´ï¿½Ê±ï¿½ï¿½*/
 	int delay_time;
-    int (*action1)(void);       /*¶¯×÷1:·¢ËÍAT*/
-    action_result (*action2)(const char *command_buffer); /*¶¯×÷2:ÅÐ¶Ï½ÓÊÕµ½µÄÊý¾ÝÊÇ·ñÎªOK»òÕßÎ´½ÓÊÕµ½*/
+    int (*action1)(void);       /*ï¿½ï¿½ï¿½ï¿½1:ï¿½ï¿½ï¿½ï¿½AT*/
+    action_result (*action2)(const char *command_buffer); /*ï¿½ï¿½ï¿½ï¿½2:ï¿½Ð¶Ï½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ÎªOKï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½Õµï¿½*/
 } nbiot_fsm_state_t;
 
 
 typedef struct
 {
-    int cur_state;  //µ±Ç°×´Ì¬
-    int trycnt;     //µ±Ç°×´Ì¬ÒÑ¾­ÖØÊÔµÄ´ÎÊý
-    uint32_t init;  //µ±Ç°×´Ì¬ÊÇÖ´ÐÐaction1»¹ÊÇÖ´ÐÐaction2
-    const nbiot_fsm_state_t *fsm_state; //µ±Ç°×´Ì¬ÊÇ¹¦ÄÜ²ÎÊý
+    int cur_state;  //ï¿½ï¿½Ç°×´Ì¬
+    int trycnt;     //ï¿½ï¿½Ç°×´Ì¬ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ÔµÄ´ï¿½ï¿½ï¿½
+    uint32_t init;  //ï¿½ï¿½Ç°×´Ì¬ï¿½ï¿½Ö´ï¿½ï¿½action1ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½action2
+    const nbiot_fsm_state_t *fsm_state; //ï¿½ï¿½Ç°×´Ì¬ï¿½Ç¹ï¿½ï¿½Ü²ï¿½ï¿½ï¿½
 } nbiot_fsm_state_index_t;
 
 

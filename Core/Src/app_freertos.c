@@ -34,8 +34,11 @@
 #include "minmea.h"
 #include "at_statemachine.h"
 #include "utils.h"
+<<<<<<< HEAD
 #include "gpio.h"
 #include "data_saver.h"
+=======
+>>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -161,7 +164,11 @@ void gps_task(void *argument)
 	while(1) {
 		osThreadFlagsWait(GPS_DATA_FLAG, osFlagsWaitAny, osWaitForever);
 		strcpy(gps_buffer, (char*)usart1_buffer);
+<<<<<<< HEAD
 		//printf("%s\n", gps_buffer);
+=======
+		printf("%s\n", gps_buffer);
+>>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 		const char* gprmc_pointer = strstr(gps_buffer, "$GPRMC");
 		if (gprmc_pointer != NULL) {
 			const char* gprmc_end_pointer = strstr(gprmc_pointer, "\n");
@@ -213,6 +220,7 @@ void at_task(void *argument)
 	init_at_statemachine();
 	nbiot_fsm_state_index_t* current_index_pointer;
 	osStatus_t wait_result = osOK;
+<<<<<<< HEAD
 	int reset_flag = 0;
 	int wait_again = 0;
 	int wait_time = 0;
@@ -230,6 +238,12 @@ void at_task(void *argument)
 			wait_time = current_index_pointer->fsm_state->wait_time;
 		}
 		
+=======
+	while(1) {
+		current_index_pointer = get_current_state_index();
+		current_index_pointer->fsm_state->action1();
+		int wait_time = current_index_pointer->fsm_state->wait_time;
+>>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 		wait_result = osThreadFlagsWait(AT_WAIT_FLAG, osFlagsWaitAny, wait_time);
 		//if time out , retry tyrcnt times.
 		printf("wait result = %d\n", wait_result);
@@ -238,6 +252,7 @@ void at_task(void *argument)
 				current_index_pointer->trycnt++;
 				continue;
 			} else {
+<<<<<<< HEAD
 				reset_flag = 1;
 				continue;
 			}
@@ -260,15 +275,33 @@ void at_task(void *argument)
 			wait_again = 1;
 		}
 		printf("number2=%d, %d, %d\n", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
+=======
+				reset_at_module();
+			}
+		}
+		const char* command = get_at_command_from_buffer((char*)usart3_buffer);
+		action_result action2_result = current_index_pointer->fsm_state->action2(command);
+		if (action2_result == ACTION_REPEAT) {
+			continue;
+		} else if (action2_result == ACTION_SUCCESS) {
+			jump_to_next_at_statemachine(); 
+		} else {
+			
+		}
+		
+>>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 	}
 }
 
 void reset_at_module() 
 {
 	printf("reset at module\n");
+<<<<<<< HEAD
 	reset_action();
 	init_at_statemachine();
 	osThreadFlagsSet(at_task_handle, AT_RESET_FLAG);
+=======
+>>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 }
 /* USER CODE END Application */
 

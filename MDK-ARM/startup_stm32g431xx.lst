@@ -75,23 +75,23 @@ ARM Macro Assembler    Page 2
    44 00000400         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
    45 00000400         ; </h>
    46 00000400         
-   47 00000400 00000200 
+   47 00000400 00002000 
                        Heap_Size
-                               EQU              0x200
+                               EQU              0x2000
    48 00000400         
    49 00000400                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
 3
    50 00000000         __heap_base
    51 00000000         Heap_Mem
                                SPACE            Heap_Size
-   52 00000200         __heap_limit
-   53 00000200         
-   54 00000200                 PRESERVE8
-   55 00000200                 THUMB
-   56 00000200         
-   57 00000200         
-   58 00000200         ; Vector Table Mapped to Address 0 at Reset
-   59 00000200                 AREA             RESET, DATA, READONLY
+   52 00002000         __heap_limit
+   53 00002000         
+   54 00002000                 PRESERVE8
+   55 00002000                 THUMB
+   56 00002000         
+   57 00002000         
+   58 00002000         ; Vector Table Mapped to Address 0 at Reset
+   59 00002000                 AREA             RESET, DATA, READONLY
    60 00000000                 EXPORT           __Vectors
    61 00000000                 EXPORT           __Vectors_End
    62 00000000                 EXPORT           __Vectors_Size
@@ -670,7 +670,7 @@ ARM Macro Assembler    Page 11
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend=newboy2\startup_stm32g431xx.d -onewboy2\startup_stm32g431xx.o -
-I..\Core\Inc -I.\RTE\_NewBoy2 -ID:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\
+I..\Core\Inc -I.\RTE\_NewBoy2 -ID:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\
 Include -ID:\Keil_v5\ARM\PACK\Keil\STM32G4xx_DFP\1.1.0\Drivers\CMSIS\Device\ST\
 STM32G4xx\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSIO
 N SETA 525" --predefine="_RTE_ SETA 1" --predefine="STM32G431xx SETA 1" --list=
@@ -737,7 +737,7 @@ Symbol: __heap_base
    Uses
       At line 403 in file startup_stm32g431xx.s
 Comment: __heap_base used once
-__heap_limit 00000200
+__heap_limit 00002000
 
 Symbol: __heap_limit
    Definitions
@@ -1600,7 +1600,7 @@ Symbol: WWDG_IRQHandler
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Absolute symbols
 
-Heap_Size 00000200
+Heap_Size 00002000
 
 Symbol: Heap_Size
    Definitions

@@ -29,10 +29,7 @@
 //uint8_t lpuart1_buffer[BUFFER_SIZE];
 uint8_t usart1_buffer[GPS_BUFFER_SIZE];
 uint8_t usart3_buffer[AT_BUFFER_SIZE];
-<<<<<<< HEAD
 uint8_t at_buffer[AT_BUFFER_SIZE];
-=======
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 uint8_t uart4_buffer[BUFFER_SIZE];
 #define ARRAY_LEN(x)            (sizeof(x) / sizeof((x)[0]))
 
@@ -114,60 +111,6 @@ void MX_LPUART1_UART_Init(void)
   /* Polling LPUART1 initialisation */
   while((!(LL_LPUART_IsActiveFlag_TEACK(LPUART1))) || (!(LL_LPUART_IsActiveFlag_REACK(LPUART1))))
   {
-<<<<<<< HEAD
-=======
-  /* USER CODE BEGIN USART3_MspInit 0 */
-
-  /* USER CODE END USART3_MspInit 0 */
-    /* USART3 clock enable */
-    __HAL_RCC_USART3_CLK_ENABLE();
-
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**USART3 GPIO Configuration
-    PB10     ------> USART3_TX
-    PB11     ------> USART3_RX
-    */
-    GPIO_InitStruct.Pin = GPIO_PIN_10;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_11;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    /* USART3 DMA Init */
-    /* USART3_RX Init */
-    hdma_usart3_rx.Instance = DMA1_Channel5;
-    hdma_usart3_rx.Init.Request = DMA_REQUEST_USART3_RX;
-    hdma_usart3_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_usart3_rx.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_usart3_rx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_usart3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_usart3_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_usart3_rx.Init.Mode = DMA_NORMAL;
-    hdma_usart3_rx.Init.Priority = DMA_PRIORITY_LOW;
-    if (HAL_DMA_Init(&hdma_usart3_rx) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(uartHandle,hdmarx,hdma_usart3_rx);
-
-    /* USART3 interrupt Init */
-    HAL_NVIC_SetPriority(USART3_IRQn, 14, 0);
-    HAL_NVIC_EnableIRQ(USART3_IRQn);
-  /* USER CODE BEGIN USART3_MspInit 1 */
-    __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
-    HAL_UART_Receive_DMA(&huart3, usart3_buffer, AT_BUFFER_SIZE);
-    __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_TC);				//关闭DMA中断
-  /* USER CODE END USART3_MspInit 1 */
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
   }
 
 }
@@ -460,41 +403,6 @@ void gpsinfo_callback()
 void atinfo_callback()
 {
 	uint16_t rx_data_length;
-<<<<<<< HEAD
-=======
-	uint32_t temp;
-	if(RESET == __HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE))
-	{	 // 判断是否是空闲中断
-		return;
-	}
-	
-	// 清除空闲中断标志（否则会一直不断进入中断）
-	__HAL_UART_CLEAR_IDLEFLAG(&huart3);  
-	// 停止本次DMA传输
-    HAL_UART_DMAStop(&huart3);
-    // 计算接收到的数据长度
-    rx_data_length  = GPS_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(&hdma_usart3_rx);
-	printf("3receive length = %d\n", rx_data_length);
-	
-	if((&huart3)->ErrorCode&HAL_UART_ERROR_ORE) {
-		printf("--------------ore3-----------");
-		__HAL_UART_CLEAR_OREFLAG((&huart3));
-	}
-	
-	if (rx_data_length >= AT_BUFFER_SIZE) {
-      HAL_UART_Receive_DMA(&huart3, (uint8_t*)usart3_buffer, AT_BUFFER_SIZE);
-	  return;
-	}
-
-	if (at_task_handle == 0) 
-		return;
-	usart3_buffer[rx_data_length]=0;
-	printf("at id = %x\n", at_task_handle);
-	osThreadFlagsSet(gps_task_handle, AT_DATA_FLAG);
-	// 重启开始DMA传输 每次255字节数据
-	//__HAL_DMA_ENABLE((&huart1)->hdmarx);
-    HAL_UART_Receive_DMA(&huart3, (uint8_t*)usart3_buffer, AT_BUFFER_SIZE);
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 
 	/* Check for IDLE line interrupt */
     if (LL_USART_IsEnabledIT_IDLE(USART3) && LL_USART_IsActiveFlag_IDLE(USART3)) {

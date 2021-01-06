@@ -25,10 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "usart.h"
 #include "stdio.h"
-<<<<<<< HEAD
 #include "stdlib.h"
-=======
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,18 +59,6 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-<<<<<<< HEAD
-=======
-extern DMA_HandleTypeDef hdma_lpuart1_rx;
-extern DMA_HandleTypeDef hdma_uart4_rx;
-extern DMA_HandleTypeDef hdma_usart1_rx;
-extern DMA_HandleTypeDef hdma_usart3_rx;
-extern UART_HandleTypeDef hlpuart1;
-extern UART_HandleTypeDef huart4;
-extern UART_HandleTypeDef huart1;
-extern UART_HandleTypeDef huart3;
-extern TIM_HandleTypeDef htim6;
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 extern TIM_HandleTypeDef htim1;
 
 /* USER CODE BEGIN EV */
@@ -291,22 +276,9 @@ void UART4_IRQHandler(void)
 void TIM6_DAC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-<<<<<<< HEAD
 
   /* USER CODE END TIM6_DAC_IRQn 0 */
 
-=======
-  if (__HAL_TIM_GET_FLAG(&htim6, TIM_FLAG_UPDATE) != RESET)
-  {
-    if (__HAL_TIM_GET_IT_SOURCE(&htim6, TIM_IT_UPDATE) != RESET)
-    {
-      __HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
-	  printf("time6 irq\n");	
-    }
-  }
-  /* USER CODE END TIM6_DAC_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim6);
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 
   /* USER CODE END TIM6_DAC_IRQn 1 */

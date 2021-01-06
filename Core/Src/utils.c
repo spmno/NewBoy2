@@ -1,28 +1,17 @@
 #include "utils.h"
 #include "stdio.h"
-<<<<<<< HEAD
-#include "cJSON.h"
-=======
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
-
-#define AT_COMMAND_BUFFER_LEN 64
-static char current_at_command_buffer[AT_COMMAND_BUFFER_LEN];
 
 #define IP_ADDRESS_BUFFER_LEN 16
 static char ip_address[IP_ADDRESS_BUFFER_LEN];
 
-<<<<<<< HEAD
 #define TOKEN_LEN	128
 static char access_token[TOKEN_LEN];
 static char refresh_token[TOKEN_LEN];
+static char current_at_command_buffer[256];
 
 const char* get_at_command_from_buffer(const char* buffer) 
 {
 #if 0
-=======
-const char* get_at_command_from_buffer(const char* buffer) 
-{
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 	const char* at_command_pos = strstr(buffer, "\r\n");
 	if (NULL == at_command_pos) {
 		return NULL;
@@ -33,13 +22,9 @@ const char* get_at_command_from_buffer(const char* buffer)
 		return NULL;
 	}
 	strncpy(current_at_command_buffer, at_command_pos, (at_command_end_pos-at_command_pos));
-<<<<<<< HEAD
 #else
 	strcpy(current_at_command_buffer, buffer);
 #endif
-=======
-	
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101
 	return current_at_command_buffer;
 }
 
@@ -54,7 +39,6 @@ void set_ip_address(const char* ip_address_para)
 	printf("set ip: %s\n", ip_address);
 }
 
-<<<<<<< HEAD
 _Bool get_token_from_buffer(const char* buffer)
 {
 	printf("get_token_from_buffer\n");
@@ -127,5 +111,3 @@ char* get_access_token(void)
 }
 
 
-=======
->>>>>>> 48bc69e74505f74fba0efc80fd7d49c4c59cc101

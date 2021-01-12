@@ -9,6 +9,8 @@
 
 #define AT_TRANSMIT_TIME	200
 
+static const char* ip = "http://39.107.84.155";
+static const char* host = "39.107.84.155";
 //reset
 int at_reset_action1(void);
 action_result at_reset_action2(const char *command_buffer);
@@ -180,6 +182,9 @@ static const at_fsm_state_t download_version_state_list[] =
 	{STATE_UPLOAD_INFO,				5,  3000,	1000, at_httpupload_action1, 			at_httpupload_action2},
 	{STATE_READ_RESULT,				5,  3000,	3000, at_readresult_action1, 			at_readresult_action2},
 };
+
+static char token_command[300];
+static char token_request_body[128];
 
 nbiot_fsm_state_index_t* get_current_state_index()
 {
@@ -465,7 +470,9 @@ action_result at_httpurl_action2(const char *command_buffer)
 int at_httpurl_add_action1(void)
 {
 	printf("send url content\n");
-	send_at_command("http://39.107.84.155/oauth/token");
+	char token_url[48];
+	sprintf(token_url, "%s/oauth/token", ip);
+	send_at_command(token_url);
 	return 0;
 }
 
@@ -477,12 +484,26 @@ action_result at_httpurl_add_action2(const char *command_buffer)
 		return ACTION_FAILED;
 	}
 }
+static char* username = "test";
+static char* password = "c70d12b4f791674b70b2";
+static char* client_id = "cb7fc9c8";
+static char* client_secret = "YyeEJfISMYMKZ6gsAyLkQwdhp6YEIQdCrPZohWz9OO4";
+static char* bike_id = "20201027001";
 
 //post at command
 int at_httppost_action1(void)
 {
 	printf("send command AT+QHTTPPOST\n");
-	send_at_command("AT+QHTTPPOST=266,80,80\r\n");
+	sprintf(token_request_body, "{\"grant_type\":\"password\",\"username\":\"%s\",\"password\":\"%s\",\"client_id\":\"%s\",\"client_secret\":\"%s\"}", 
+		username, password, client_id, client_secret);
+	int request_body_length = strlen(token_request_body);
+	sprintf(token_command, "POST /oauth/token HTTP/1.1\r\nHost: %s\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n%s", 
+		host, request_body_length, token_request_body);
+	
+	char post_config_command[48];
+	int command_length = strlen(token_command);
+	sprintf(post_config_command, "AT+QHTTPPOST=%d,80,80\r\n", command_length); 
+	send_at_command(post_config_command);
 	return 0;
 }
 
@@ -495,11 +516,12 @@ action_result at_httppost_action2(const char *command_buffer)
 	}
 }
 
+
+
 int at_httptoken_action1(void)
 {
 	printf("send post data\n");
-	char* send_data = "POST /oauth/token HTTP/1.1\r\nHost: 39.107.84.155\r\nContent-Type: application/json\r\nContent-Length: 162\r\n\r\n{\"grant_type\":\"password\",\"username\":\"test\",\"password\":\"c70d12b4f791674b70b2\",\"client_id\":\"cb7fc9c8\",\"client_secret\":\"YyeEJfISMYMKZ6gsAyLkQwdhp6YEIQdCrPZohWz9OO4\"}";
-	send_at_command(send_data);
+	send_at_command(token_command);
 	return 0;
 }
 
@@ -559,7 +581,9 @@ action_result at_httpurl1_action2(const char *command_buffer)
 int at_httpurl1_add_action1(void)
 {
 	printf("send url1 content\n");
-	send_at_command("http://39.107.84.155/api/v1/bikes/upload/20201027001");
+	char url_content[64];
+	sprintf(url_content, "%s/api/v1/bikes/upload/%s", ip, bike_id);
+	send_at_command(url_content);
 	return 0;
 }
 
@@ -574,16 +598,22 @@ action_result at_httpurl1_add_action2(const char *command_buffer)
 
 //post bike data command
 static char send_data[512];
+static char send_content[128];
 int at_httppost1_action1(void)
 {
 	char post_buffer[32];
 	int post_len = 0;
 	printf("send command AT+QHTTPPOST1\n");
 	gps_info *gps_info_pointer = get_gps_info();
-	sprintf(send_data, "POST /api/v1/bikes/upload/20201027001 HTTP/1.1\r\nHost: 39.107.84.155\r\nContent-Type: application/json\r\nContent-Length: 58\r\nAuthorization: Bearer %s\r\n\r\n{\"longitude\":\"%0.4f\",\"latitude\":\"%0.4f\",\"diag_info\":{}}", 
+	sprintf(send_content, "{\"longitude\":\"%0.4f\",\"latitude\":\"%0.4f\",\"diag_info\":{}", gps_info_pointer->longitude, gps_info_pointer->latitude);
+	int send_content_length = strlen(send_content);
+	sprintf(send_data, "POST /api/v1/bikes/upload/%s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/json\r\nContent-Length: %d\r\nAuthorization: Bearer %s\r\n\r\n%s}", 
+			bike_id,
+			host,
+			send_content_length,
 			get_access_token(), 
-			gps_info_pointer->longitude,
-			gps_info_pointer->latitude);
+			send_content
+			);
 	post_len = strlen(send_data);
 	sprintf(post_buffer, "AT+QHTTPPOST=%d,80,80\r\n", post_len);
 	send_at_command(post_buffer);

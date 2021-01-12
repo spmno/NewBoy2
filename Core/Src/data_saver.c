@@ -1,7 +1,9 @@
 #include "data_saver.h"
 #include "stdio.h"
 
-static gps_info current_gps_info;
+static gps_info current_gps_info = {
+	123.2859, 41.4165
+};
 
 void save_gps_info(int longitude, int latitude)
 {

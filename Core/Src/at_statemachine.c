@@ -91,8 +91,10 @@ void send_at_command(char* command);
 static nbiot_fsm_state_index_t nbiot_fsm_state_index;
 static int current_state_index = 0;
 
-	
-//��ǰ״̬, ��һ��״̬, ���Դ���, �ȴ�ʱ��, ����, ����
+static _Bool need_check_update = true;
+static _Bool need_download_file = false;
+
+/*
 static const nbiot_fsm_state_t nbiot_state_list[] =
 {
 	//{STATE_HAL_RESET,				STATE_AT, 	         		1,  3000, 	at_reset_action1, 					at_reset_action2		},
@@ -117,35 +119,142 @@ static const nbiot_fsm_state_t nbiot_state_list[] =
 	{STATE_READ_RESULT,				STATE_QHTTPPOST1,			5,  3000,	3000, at_readresult_action1, 			at_readresult_action2},
 
 };
+*/
+
+static at_fsm_state_t *current_at_state_list;
+static const at_fsm_state_t init_at_state_list[] = 
+{
+	{STATE_AT,       				3,  3000,	1000, at_action1,         			at_action2         		},
+	{STATE_CPIN,     				3,  10000,	1000, at_pin_action1,       		at_pin_action2     		},
+	{STATE_CREG,					3,  30000,	1000, at_creg_action1,  			at_creg_action2  		},
+	{STATE_CGREG,					3,  30000,	1000, at_cgreg_action1, 	 		at_cgreg_action2  		},
+	{STATE_QICSGP,					3,  1000,	1000, at_csgp_action1,  			at_csgp_action2  		},
+	{STATE_QIACT,					3,  1000,	1000, at_act_action1,  				at_act_action2  		},
+	{STATE_QIACT_RESULT,			3,  1000,	1000, at_query_act_action1, 		at_query_act_action2	},
+	{STATE_QHTTPCFG_CONTEXT,		5,  3000,	1000, at_httpcfg_context_action1, 	at_httpcfg_context_action2},
+	{STATE_QHTTPREQ_HEADER,			5,  3000,	1000, at_httpcfg_header_action1, 	at_httpcfg_header_action2},
+};
+
+static const at_fsm_state_t get_token_state_list[] = 
+{
+	{STATE_QHTTPURL,				5,  3000,	1000, at_httpurl_action1, 				at_httpurl_action2},
+	{STATE_QHTTPURL_CONTENT,		5,  3000,	1000, at_httpurl_add_action1, 		at_httpurl_add_action2},
+	{STATE_QHTTPPOST,				5,  3000,	1000, at_httppost_action1, 				at_httppost_action2},
+	{STATE_REQUEST_TOKEN,			5,  3000,	1000, at_httptoken_action1, 			at_httptoken_action2},
+	{STATE_READ_TOKEN,				5,  3000,	1000, at_readtoken_action1, 			at_readtoken_action2},
+};
+
+static const at_fsm_state_t upload_state_list[] = 
+{
+	{STATE_QHTTPURL1,				5,  3000,	1000, at_httpurl1_action1, 				at_httpurl1_action2},
+	{STATE_QHTTPURL_CONTENT1,		5,  3000,	1000, at_httpurl1_add_action1, 		at_httpurl1_add_action2},
+	{STATE_QHTTPPOST1,				5,  3000,	1000, at_httppost1_action1, 				at_httppost1_action2},
+	{STATE_UPLOAD_INFO,				5,  3000,	1000, at_httpupload_action1, 			at_httpupload_action2},
+	{STATE_READ_RESULT,				5,  3000,	3000, at_readresult_action1, 			at_readresult_action2},
+};
+
+static const at_fsm_state_t check_version_state_list[] = 
+{
+	{STATE_QHTTPURL,				5,  3000,	1000, at_httpurl_action1, 				at_httpurl_action2},
+	{STATE_QHTTPURL_CONTENT,		5,  3000,	1000, at_httpurl_add_action1, 		at_httpurl_add_action2},
+	{STATE_QHTTPPOST,				5,  3000,	1000, at_httppost_action1, 				at_httppost_action2},
+	{STATE_REQUEST_TOKEN,			5,  3000,	1000, at_httptoken_action1, 			at_httptoken_action2},
+	{STATE_READ_TOKEN,				5,  3000,	1000, at_readtoken_action1, 			at_readtoken_action2},
+	{STATE_QHTTPURL1,				5,  3000,	1000, at_httpurl1_action1, 				at_httpurl1_action2},
+	{STATE_QHTTPURL_CONTENT1,		5,  3000,	1000, at_httpurl1_add_action1, 		at_httpurl1_add_action2},
+	{STATE_QHTTPPOST1,				5,  3000,	1000, at_httppost1_action1, 				at_httppost1_action2},
+	{STATE_UPLOAD_INFO,				5,  3000,	1000, at_httpupload_action1, 			at_httpupload_action2},
+	{STATE_READ_RESULT,				5,  3000,	3000, at_readresult_action1, 			at_readresult_action2},
+};
+
+static const at_fsm_state_t download_version_state_list[] = 
+{
+	{STATE_QHTTPURL,				5,  3000,	1000, at_httpurl_action1, 				at_httpurl_action2},
+	{STATE_QHTTPURL_CONTENT,		5,  3000,	1000, at_httpurl_add_action1, 		at_httpurl_add_action2},
+	{STATE_QHTTPPOST,				5,  3000,	1000, at_httppost_action1, 				at_httppost_action2},
+	{STATE_REQUEST_TOKEN,			5,  3000,	1000, at_httptoken_action1, 			at_httptoken_action2},
+	{STATE_READ_TOKEN,				5,  3000,	1000, at_readtoken_action1, 			at_readtoken_action2},
+	{STATE_QHTTPURL1,				5,  3000,	1000, at_httpurl1_action1, 				at_httpurl1_action2},
+	{STATE_QHTTPURL_CONTENT1,		5,  3000,	1000, at_httpurl1_add_action1, 		at_httpurl1_add_action2},
+	{STATE_QHTTPPOST1,				5,  3000,	1000, at_httppost1_action1, 				at_httppost1_action2},
+	{STATE_UPLOAD_INFO,				5,  3000,	1000, at_httpupload_action1, 			at_httpupload_action2},
+	{STATE_READ_RESULT,				5,  3000,	3000, at_readresult_action1, 			at_readresult_action2},
+};
 
 nbiot_fsm_state_index_t* get_current_state_index()
 {
 	return &nbiot_fsm_state_index;
 }
 
-void init_at_statemachine()
+
+void init_at_statemachine(const at_fsm_state_t *task_list)
 {
+	current_at_state_list = (at_fsm_state_t *)task_list;
+	
 	nbiot_fsm_state_index.cur_state = STATE_AT;
 	nbiot_fsm_state_index.init = 1;
 	nbiot_fsm_state_index.trycnt = 0;
-	nbiot_fsm_state_index.fsm_state = &nbiot_state_list[0];
+	nbiot_fsm_state_index.fsm_state = current_at_state_list;
 	current_state_index = 0;
 }
 
 void jump_to_next_at_statemachine() 
 {
-	current_state_index = nbiot_fsm_state_index.fsm_state->next_state;
-	nbiot_fsm_state_index.cur_state = nbiot_state_list[current_state_index].cur_state;
+	current_state_index++;
+	nbiot_fsm_state_index.cur_state = current_at_state_list[current_state_index].cur_state;
 	nbiot_fsm_state_index.init = 1;
 	nbiot_fsm_state_index.trycnt = 0;
-	nbiot_fsm_state_index.fsm_state = &nbiot_state_list[current_state_index];;
+	nbiot_fsm_state_index.fsm_state = &current_at_state_list[current_state_index];
 }
 
-const nbiot_fsm_state_t* find_state_from_command(nbiot_state_e command)
+// switch task logic
+void jump_to_next_at_task(void)
+{
+	// finish init
+	if (current_at_state_list == init_at_state_list) {
+		if (need_check_update) {
+			init_at_statemachine(check_version_state_list);
+		} else {
+			init_at_statemachine(get_token_state_list);
+		} 
+	} else if (current_at_state_list == check_version_state_list) {
+		if (need_download_file) {
+			init_at_statemachine(download_version_state_list);
+		} else {
+			init_at_statemachine(get_token_state_list);
+		}
+	} else if (current_at_state_list == download_version_state_list) {
+		
+	} else if (current_at_state_list == get_token_state_list) {
+		init_at_statemachine(upload_state_list);
+	} else if (current_at_state_list == upload_state_list) {
+		init_at_statemachine(upload_state_list);
+	} else {
+		init_at_statemachine(init_at_state_list);
+	}
+}
+
+void init_at_module(void)
+{
+	init_at_statemachine(init_at_state_list);
+}
+
+
+void jump_to_init_at_task(void)
+{
+	init_at_statemachine(init_at_state_list);
+}
+
+void push_task(nbiot_fsm_state_t* task_attr)
+{
+	//task_stack[++current_task_index] = task_attr;
+}
+
+const at_fsm_state_t* find_state_from_command(nbiot_state_e command)
 {
 	for (int i = 0; i < STATE_LENGTH; ++i) {
-		if (nbiot_state_list[i].cur_state == command) {
-			return &nbiot_state_list[i];
+		if (current_at_state_list[i].cur_state == command) {
+			return &current_at_state_list[i];
 		}
 	}
 	return NULL;
@@ -328,7 +437,7 @@ int at_httpcfg_header_action1(void)
 action_result at_httpcfg_header_action2(const char *command_buffer)
 {
 	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
-		return ACTION_SUCCESS;
+		return ACTION_COMPLETED;
 	} else {
 		return ACTION_FAILED;
 	}
@@ -422,7 +531,7 @@ action_result at_readtoken_action2(const char *command_buffer)
 {
 	if (isCorrectCommand(command_buffer, "CONNECT") == SUCCESS) {
 		if(get_token_from_buffer(command_buffer)) {
-			return ACTION_SUCCESS;
+			return ACTION_COMPLETED;
 		}
 	}
 	
@@ -531,7 +640,7 @@ action_result at_readresult_action2(const char *command_buffer)
 {	
 	if ((isCorrectCommand(command_buffer, "CONNECT") == SUCCESS) || isCorrectCommand(command_buffer, "QHTTPREAD") == SUCCESS) {
 		get_result_from_buffer(command_buffer);
-		return ACTION_SUCCESS;
+		return ACTION_COMPLETED;
 	} else {
 		return ACTION_FAILED;
 	}
@@ -580,8 +689,8 @@ void send_at_command(char *data)
  
   while(*data)
   {
-    while(LL_USART_IsActiveFlag_TC(USART3)!=1);//�ȴ��������
-    LL_USART_TransmitData8(USART3,(uint8_t)(*data & (uint8_t)0xff));//��������
+    while(LL_USART_IsActiveFlag_TC(USART3)!=1);//
+    LL_USART_TransmitData8(USART3,(uint8_t)(*data & (uint8_t)0xff));//
     data++;
   }
 }

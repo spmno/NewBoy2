@@ -143,6 +143,13 @@ void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+  // init at module
+	
+  // check new version
+	
+  // download file
+	
+  // 
   for(;;)
   {
     HAL_Delay(1000);
@@ -210,7 +217,7 @@ void gps_task(void *argument)
 
 void at_task(void *argument) 
 {
-	init_at_statemachine();
+	init_at_module();
 	nbiot_fsm_state_index_t* current_index_pointer;
 	osStatus_t wait_result = osOK;
 	int reset_flag = 0;
@@ -218,7 +225,7 @@ void at_task(void *argument)
 	int wait_time = 0;
 	while(1) {
 		if (reset_flag) {
-			reset_at_module();
+			jump_to_init_at_task();
 			reset_flag = 0;
 		}
 		
@@ -258,6 +265,8 @@ void at_task(void *argument)
 			jump_to_next_at_statemachine(); 
 		} else if (action2_result == ACTION_WAIT_AGAIN) {
 			wait_again = 1;
+		} else if (action2_result == ACTION_COMPLETED) {
+			jump_to_next_at_task();
 		}
 		printf("number2=%d, %d, %d\n", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
 	}
@@ -267,7 +276,7 @@ void reset_at_module()
 {
 	printf("reset at module\n");
 	reset_action();
-	init_at_statemachine();
+	init_at_module();
 	osThreadFlagsSet(at_task_handle, AT_RESET_FLAG);
 }
 /* USER CODE END Application */

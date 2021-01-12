@@ -24,7 +24,7 @@ typedef enum
 	STATE_QHTTPPOST1,				/* send post request */
 	STATE_UPLOAD_INFO,	
 	STATE_READ_RESULT,
-	STATE_IDEL,             /*����״̬*/  
+	STATE_IDEL,            
 	STATE_LENGTH,
 } nbiot_state_e;
 
@@ -32,38 +32,46 @@ typedef enum
 {
   ACTION_SUCCESS= 0x01,  
   ACTION_FAILED,
-	ACTION_REPEAT,
-	ACTION_WAIT_AGAIN,
-	ACTION_RESULT_LENGTH,
+  ACTION_REPEAT,
+  ACTION_WAIT_AGAIN,
+  ACTION_COMPLETED,
 } action_result;
 
 typedef struct 
 {
-    nbiot_state_e cur_state;    /*��ǰ״̬*/
-    nbiot_state_e next_state;   /*��һ��״̬*/
-    int  try_cnt;               /*���Դ���*/
-    int  wait_time;             /*�ȴ�ʱ��*/
+    nbiot_state_e cur_state;  
+    nbiot_state_e next_state;   
+    int  try_cnt;              
+    int  wait_time;           
 	int delay_time;
-    int (*action1)(void);       /*����1:����AT*/
-    action_result (*action2)(const char *command_buffer); /*����2:�жϽ��յ��������Ƿ�ΪOK����δ���յ�*/
+    int (*action1)(void);      
+    action_result (*action2)(const char *command_buffer); 
 } nbiot_fsm_state_t;
 
+typedef struct 
+{
+    nbiot_state_e cur_state;  
+    int  try_cnt;              
+    int  wait_time;           
+	int delay_time;
+    int (*action1)(void);      
+    action_result (*action2)(const char *command_buffer); 
+} at_fsm_state_t;
 
 typedef struct
 {
-    int cur_state;  //��ǰ״̬
-    int trycnt;     //��ǰ״̬�Ѿ����ԵĴ���
-    uint32_t init;  //��ǰ״̬��ִ��action1����ִ��action2
-    const nbiot_fsm_state_t *fsm_state; //��ǰ״̬�ǹ��ܲ���
+    int cur_state;  
+    int trycnt;     
+    uint32_t init;  
+    const at_fsm_state_t *fsm_state; 
 } nbiot_fsm_state_index_t;
 
 
-
-
-
-
-void init_at_statemachine(void);
 nbiot_fsm_state_index_t* get_current_state_index(void);
 void jump_to_next_at_statemachine(void);
+void jump_to_next_at_task(void);
+void jump_to_init_at_task(void);
+
+void init_at_module(void);
 
 

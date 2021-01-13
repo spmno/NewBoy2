@@ -52,7 +52,7 @@ void MX_USART1_UART_Init(void);
 void MX_USART3_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+void send_at_command(char *data);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

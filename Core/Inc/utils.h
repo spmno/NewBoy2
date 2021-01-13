@@ -1,6 +1,12 @@
 #include "stdlib.h"
 #include "string.h"
+#include "stdio.h"
 #include "stdbool.h"
+#include "at_define.h"
+
+extern const char* ip;
+extern const char* host;
+
 
 const char* get_at_command_from_buffer(const char* buffer);
 
@@ -13,4 +19,8 @@ _Bool get_token_from_buffer(const char* buffer);
 _Bool get_result_from_buffer(const char* buffer);
 
 char* get_access_token(void);
+
+ErrorStatus isCorrectCommand(const char* buffer, const char* command);
+
+
 

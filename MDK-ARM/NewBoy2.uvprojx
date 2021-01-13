@@ -486,6 +486,46 @@
               <FileType>5</FileType>
               <FilePath>..\Core\Inc\data_saver.h</FilePath>
             </File>
+            <File>
+              <FileName>init_state.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\init_state.h</FilePath>
+            </File>
+            <File>
+              <FileName>get_token_state.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\get_token_state.h</FilePath>
+            </File>
+            <File>
+              <FileName>upload_state.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\upload_state.h</FilePath>
+            </File>
+            <File>
+              <FileName>check_version_state.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\check_version_state.h</FilePath>
+            </File>
+            <File>
+              <FileName>init_state.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\init_state.c</FilePath>
+            </File>
+            <File>
+              <FileName>at_define.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\at_define.h</FilePath>
+            </File>
+            <File>
+              <FileName>get_token_state.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\get_token_state.c</FilePath>
+            </File>
+            <File>
+              <FileName>upload_state.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\upload_state.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

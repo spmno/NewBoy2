@@ -9,6 +9,15 @@ static char access_token[TOKEN_LEN];
 static char refresh_token[TOKEN_LEN];
 static char current_at_command_buffer[256];
 
+ErrorStatus isCorrectCommand(const char* buffer, const char* command)
+{
+	if (strstr(buffer, command) != NULL) {
+		return SUCCESS;
+	} else {
+		return ERROR;
+	}
+}
+
 const char* get_at_command_from_buffer(const char* buffer) 
 {
 #if 0

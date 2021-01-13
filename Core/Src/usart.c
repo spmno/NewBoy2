@@ -448,6 +448,16 @@ PUTCHAR_PROTOTYPE
   return ch;
 }
 
+void send_at_command(char *data)
+{
+ 
+  while(*data)
+  {
+    while(LL_USART_IsActiveFlag_TC(USART3)!=1);//
+    LL_USART_TransmitData8(USART3,(uint8_t)(*data & (uint8_t)0xff));//
+    data++;
+  }
+}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -140,7 +140,7 @@ int at_httpcfg_context_action1(void)
 action_result at_httpcfg_context_action2(const char *command_buffer)
 {
 	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
-		return ACTION_SUCCESS;
+		return ACTION_COMPLETED;
 	} else {
 		return ACTION_FAILED;
 	}
@@ -158,7 +158,7 @@ int at_httpcfg_header_action1(void)
 action_result at_httpcfg_header_action2(const char *command_buffer)
 {
 	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
-		return ACTION_COMPLETED;
+		return ACTION_SUCCESS;
 	} else {
 		return ACTION_FAILED;
 	}

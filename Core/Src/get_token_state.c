@@ -4,12 +4,16 @@
 
 static char token_command[300];
 static char token_request_body[128];
-
+static char token_url[48];
 //configure url for https server
 int at_httpurl_action1(void)
 {
 	printf("send command AT+QHTTPURL\n");
-	send_at_command("AT+QHTTPURL=32,80\r\n");
+	sprintf(token_url, "%s/oauth/token", ip);
+	int url_length = strlen(token_url);
+	char url_command[32];
+	sprintf(url_command, "AT+QHTTPURL=%d,80\r\n", url_length);
+	send_at_command(url_command);
 	return 0;
 }
 
@@ -26,8 +30,6 @@ action_result at_httpurl_action2(const char *command_buffer)
 int at_httpurl_add_action1(void)
 {
 	printf("send url content\n");
-	char token_url[48];
-	sprintf(token_url, "%s/oauth/token", ip);
 	send_at_command(token_url);
 	return 0;
 }
@@ -71,8 +73,6 @@ action_result at_httppost_action2(const char *command_buffer)
 		return ACTION_FAILED;
 	}
 }
-
-
 
 int at_httptoken_action1(void)
 {

@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "stdio.h"
+#include "data_saver.h"
 
 #define IP_ADDRESS_BUFFER_LEN 16
 static char ip_address[IP_ADDRESS_BUFFER_LEN];
@@ -7,7 +8,10 @@ static char ip_address[IP_ADDRESS_BUFFER_LEN];
 #define TOKEN_LEN	128
 static char access_token[TOKEN_LEN];
 static char refresh_token[TOKEN_LEN];
+
 static char current_at_command_buffer[256];
+extern char version_string[16];
+extern char download_file_url[128];
 
 ErrorStatus isCorrectCommand(const char* buffer, const char* command)
 {
@@ -62,6 +66,40 @@ _Bool get_token_from_buffer(const char* buffer)
 	const char* end_dqmark_position = strchr(start_dqmark_position+1, '"');
 	strncpy(access_token, start_dqmark_position, end_dqmark_position-start_dqmark_position);
 	printf("access_token:%s\n", access_token);
+	return true;
+}
+
+_Bool get_version_from_buffer(const char* buffer)
+{
+	printf("get_version_buffer\n");
+	char *version_str = "\"version\"";
+	const char* version_position = strstr(buffer, version_str);
+	if (NULL == version_position) {
+		printf("not found { \n");
+		return false;
+	}
+	const char* token_end_posiont = version_position+strlen(version_str)+1;
+	const char* start_dqmark_position = strchr(token_end_posiont, '"') + 1;
+	const char* end_dqmark_position = strchr(start_dqmark_position+1, '"');
+	strncpy(version_string, start_dqmark_position, end_dqmark_position-start_dqmark_position);
+	printf("version:%s\n", version_string);
+	return true;
+}
+
+_Bool get_file_url_form_buffer(const char* buffer)
+{
+	printf("get_file_url_buffer\n");
+	char *version_str = "\"url\"";
+	const char* version_position = strstr(buffer, version_str);
+	if (NULL == version_position) {
+		printf("not found { \n");
+		return false;
+	}
+	const char* token_end_posiont = version_position+strlen(version_str)+1;
+	const char* start_dqmark_position = strchr(token_end_posiont, '"') + 1;
+	const char* end_dqmark_position = strchr(start_dqmark_position+1, '"');
+	strncpy(download_file_url, start_dqmark_position, end_dqmark_position-start_dqmark_position);
+	printf("fileurl:%s\n", download_file_url);
 	return true;
 }
 /*

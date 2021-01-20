@@ -3,12 +3,17 @@
 #include "data_saver.h"
 
 static char* bike_id = "20201027001";
+char url_content[64];
 
 //configure url for update
 int at_httpurl1_action1(void)
 {
 	printf("send command AT+QHTTPURL1\n");
-	send_at_command("AT+QHTTPURL=52,80\r\n");
+	sprintf(url_content, "%s/api/v1/bikes/upload/%s", ip, bike_id);
+	int url_length = strlen(url_content);
+	char url_command[32];
+	sprintf(url_command, "AT+QHTTPURL=%d,80\r\n", url_length);
+	send_at_command(url_command);
 	return 0;
 }
 
@@ -25,8 +30,6 @@ action_result at_httpurl1_action2(const char *command_buffer)
 int at_httpurl1_add_action1(void)
 {
 	printf("send url1 content\n");
-	char url_content[64];
-	sprintf(url_content, "%s/api/v1/bikes/upload/%s", ip, bike_id);
 	send_at_command(url_content);
 	return 0;
 }

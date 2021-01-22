@@ -144,7 +144,7 @@ int at_read_file_action1(void)
 action_result at_read_file_action2(const char *command_buffer)
 {
 	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
-		printf("read file again\n");
+		printf("read file\n");
 		return ACTION_WAIT_AGAIN;;
 	} else if (isCorrectCommand(command_buffer, "QHTTPREADFILE") == SUCCESS) {
 		printf("read file again\n");

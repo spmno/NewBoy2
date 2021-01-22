@@ -157,4 +157,32 @@ char* get_access_token(void)
 	return access_token;
 }
 
+#define UPDATE_FLAG_ADDRESS	0x0801F800
+#define UPDATE_FLAG_PAGE	31
 
+_Bool save_update_flag(void)
+{
+	uint64_t update_flag = 0x44;
+	FLASH_EraseInitTypeDef  flash_erase_init;
+	HAL_FLASH_Unlock();
+	flash_erase_init.TypeErase = FLASH_TYPEERASE_PAGES;
+	flash_erase_init.Page = UPDATE_FLAG_PAGE;
+	flash_erase_init.NbPages = 1;
+	
+	uint32_t page_error = 0;
+	HAL_FLASHEx_Erase(&flash_erase_init, &page_error);
+	
+	HAL_StatusTypeDef result = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, UPDATE_FLAG_ADDRESS, update_flag);
+	HAL_FLASH_Lock();
+	
+	if (result == HAL_OK) {
+		uint64_t read_flag = *(__IO uint64_t*)UPDATE_FLAG_ADDRESS;
+		if (read_flag == update_flag) {
+			printf("wrote the flag\n");
+			return true;
+		}
+	} 
+	
+	printf("worte flag failed");
+	return false;
+}

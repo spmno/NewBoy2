@@ -26,5 +26,6 @@ char* get_access_token(void);
 
 ErrorStatus isCorrectCommand(const char* buffer, const char* command);
 
+_Bool save_update_flag(void);
 
 

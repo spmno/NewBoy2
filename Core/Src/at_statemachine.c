@@ -126,7 +126,7 @@ void jump_to_next_at_task(void)
 		}			
 		init_at_statemachine(get_token_state_list);
 	} else if (current_at_state_list == download_version_state_list) {
-		
+		save_update_flag();
 	} else if (current_at_state_list == get_token_state_list) {
 		init_at_statemachine(upload_state_list);
 	} else if (current_at_state_list == upload_state_list) {

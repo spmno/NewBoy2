@@ -211,7 +211,7 @@ void gps_task(void *argument)
                printf("$xxGGA sentence is not parsed\n");
             }
 		}
-		printf("number1=%d, %d, %d", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
+		printf("number1=%ld, %ld, %ld", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
 	}
 }
 
@@ -241,7 +241,7 @@ void at_task(void *argument)
 		//if time out , retry tyrcnt times.
 		printf("wait result = %d\n", wait_result);
 		if (wait_result == osErrorTimeout) {
-			if (current_index_pointer->trycnt <= current_index_pointer->fsm_state->try_cnt) {
+			if (current_index_pointer->trycnt < current_index_pointer->fsm_state->try_cnt) {
 				current_index_pointer->trycnt++;
 				continue;
 			} else {
@@ -267,8 +267,10 @@ void at_task(void *argument)
 			wait_again = 1;
 		} else if (action2_result == ACTION_COMPLETED) {
 			jump_to_next_at_task();
+		} else {
+			current_index_pointer->trycnt++;
 		}
-		printf("number2=%d, %d, %d\n", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
+		printf("number2=%ld, %ld, %ld\n", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
 	}
 }
 

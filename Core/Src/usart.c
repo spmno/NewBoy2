@@ -431,7 +431,6 @@ void atinfo_callback()
 		LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_5);
 
     }
-	
 }
 
 

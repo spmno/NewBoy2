@@ -351,8 +351,28 @@ void MX_USART3_UART_Init(void)
 
   /* USER CODE BEGIN WKUPType USART3 */
   LL_USART_EnableDMAReq_RX(USART3);
-  LL_USART_EnableIT_IDLE(USART3);
-  LL_DMA_EnableIT_TE(DMA1, LL_DMA_CHANNEL_5);
+  LL_USART_DisableIT_CTS(USART3);
+  LL_USART_DisableIT_RXNE(USART3);
+  LL_USART_DisableIT_IDLE(USART3);
+  LL_USART_DisableIT_RXNE_RXFNE(USART3);
+  LL_USART_DisableIT_TC(USART3);
+  LL_USART_DisableIT_TXE(USART3);
+  LL_USART_DisableIT_TXE_TXFNF(USART3);
+  LL_USART_DisableIT_PE(USART3);
+  LL_USART_DisableIT_CM(USART3);
+  LL_USART_DisableIT_EOB(USART3);
+  LL_USART_DisableIT_TXFE(USART3);
+  LL_USART_DisableIT_RXFF(USART3);
+  LL_USART_DisableIT_LBD(USART3);
+  LL_USART_DisableIT_TXFT(USART3);
+  LL_USART_DisableIT_TCBGT(USART3);
+  LL_USART_DisableIT_RXFT(USART3);
+  
+  LL_USART_EnableRxTimeout(USART3);
+  LL_USART_EnableIT_RTO(USART3);
+  LL_USART_SetRxTimeout(USART3, 100);
+  LL_USART_DisableOverrunDetect(USART3);
+  
   LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)&USART3->RDR);
   LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)usart3_buffer);
   LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_5, ARRAY_LEN(usart3_buffer));
@@ -405,12 +425,15 @@ void atinfo_callback()
 	uint16_t rx_data_length;
 
 	/* Check for IDLE line interrupt */
-    if (LL_USART_IsEnabledIT_IDLE(USART3) && LL_USART_IsActiveFlag_IDLE(USART3)) {
-        LL_USART_ClearFlag_IDLE(USART3);      /* Clear IDLE line flag */
-		if(LL_USART_IsActiveFlag_ORE(USART3)) {
-			printf("------ore-------3\n");
-			LL_USART_ClearFlag_ORE(USART3);
-		}
+	/* Check for RTO line interrupt */
+    if (LL_USART_IsActiveFlag_RTO(USART3)) {
+		printf("t:%d,%x\n", xTaskGetTickCountFromISR(), USART3->ISR); 
+        LL_USART_ClearFlag_RTO(USART3);      /* Clear RTO line flag */
+		printf("r:%x, %x\n", USART3->ISR, USART3->RTOR);
+		//if(LL_USART_IsActiveFlag_ORE(USART3)) {
+		//	printf("------ore-------3\n");
+		//	LL_USART_ClearFlag_ORE(USART3);
+		//}
 		
 		rx_data_length = ARRAY_LEN(usart3_buffer) - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_5);
 		LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_5);

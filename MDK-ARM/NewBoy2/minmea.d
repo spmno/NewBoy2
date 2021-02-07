@@ -1,0 +1,12 @@
+newboy2\minmea.o: ..\Core\Src\minmea.c
+newboy2\minmea.o: ../Core/Inc/minmea.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\errno.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\time.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\ctype.h
+newboy2\minmea.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h

@@ -79,7 +79,7 @@ action_result at_csgp_action2(const char *command_buffer)
 	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
 		printf("at_csgp_action2 s\n");
 		return ACTION_SUCCESS;
-	} if(isCorrectCommand(command_buffer, "AT+QICSGP=1") == SUCCESS) {
+	} else if(isCorrectCommand(command_buffer, "AT+QICSGP=1") == SUCCESS) {
 		printf("at_csgp_action2 a\n");
 		return ACTION_WAIT_AGAIN;;
 	} else {
@@ -97,9 +97,12 @@ int at_act_action1(void)
 }
 
 action_result at_act_action2(const char *command_buffer)
-{
+{	
 	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
 		return ACTION_SUCCESS;
+	}  else if(isCorrectCommand(command_buffer, "QIACT") == SUCCESS) {
+		printf("QIACT--\n");
+		return ACTION_WAIT_AGAIN;;
 	} else {
 		return ACTION_FAILED;
 	}

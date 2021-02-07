@@ -233,7 +233,6 @@ void at_task(void *argument)
 		if (!wait_again) {
 			current_index_pointer = get_current_state_index();
 			current_index_pointer->fsm_state->action1();
-			HAL_Delay(500);
 			wait_time = current_index_pointer->fsm_state->wait_time;
 		}
 		
@@ -269,6 +268,7 @@ void at_task(void *argument)
 			jump_to_next_at_task();
 		} else {
 			current_index_pointer->trycnt++;
+			HAL_Delay(current_index_pointer->fsm_state->delay_time);
 		}
 		printf("number2=%ld, %ld, %ld\n", uxTaskGetNumberOfTasks(), uxTaskGetStackHighWaterMark(gps_task_handle), uxTaskGetStackHighWaterMark(at_task_handle));
 	}

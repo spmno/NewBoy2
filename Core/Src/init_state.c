@@ -12,6 +12,8 @@ action_result at_action2(const char *command_buffer)
 {
 	if (isCorrectCommand(command_buffer, "OK") == SUCCESS) {
 		return ACTION_SUCCESS;
+	} else if (isCorrectCommand(command_buffer, "CPIN") == SUCCESS) {
+		return ACTION_WAIT_AGAIN;
 	} else {
 		return ACTION_FAILED;
 	}

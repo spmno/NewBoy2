@@ -19,7 +19,7 @@
 const char* ip = "http://39.107.84.155";
 const char* host = "39.107.84.155";
 const char* app_name = "NewBoy2";
-const float version = 0.1;
+const float version = 1;
 
 static nbiot_fsm_state_index_t nbiot_fsm_state_index;
 static int current_state_index = 0;

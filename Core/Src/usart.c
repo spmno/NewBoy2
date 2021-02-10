@@ -25,11 +25,13 @@
 #include "stdlib.h"
 #include "string.h"
 #include "user_task.h"
+#include "queue.h"
 
 //uint8_t lpuart1_buffer[BUFFER_SIZE];
 uint8_t usart1_buffer[GPS_BUFFER_SIZE];
-uint8_t usart3_buffer[AT_BUFFER_SIZE];
-uint8_t at_buffer[AT_BUFFER_SIZE];
+uint8_t at_buffer1[AT_BUFFER_SIZE];
+uint8_t at_buffer2[AT_BUFFER_SIZE];
+uint32_t receive_buffer_index = 1;
 uint8_t uart4_buffer[BUFFER_SIZE];
 #define ARRAY_LEN(x)            (sizeof(x) / sizeof((x)[0]))
 
@@ -374,8 +376,8 @@ void MX_USART3_UART_Init(void)
   LL_USART_DisableOverrunDetect(USART3);
   
   LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)&USART3->RDR);
-  LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)usart3_buffer);
-  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_5, ARRAY_LEN(usart3_buffer));
+  LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)at_buffer1);
+  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_5, ARRAY_LEN(at_buffer1));
   LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_5);
   /* USER CODE END WKUPType USART3 */
 
@@ -420,39 +422,55 @@ void gpsinfo_callback()
 
 }
 
+extern xQueueHandle at_queue_handle;
 void atinfo_callback()
 {
 	uint16_t rx_data_length;
-
-	/* Check for IDLE line interrupt */
+	portBASE_TYPE xHigherPriorityTaskWoken;
+	uint8_t* pxMessage;
 	/* Check for RTO line interrupt */
     if (LL_USART_IsActiveFlag_RTO(USART3)) {
-		printf("t:%d,%x\n", xTaskGetTickCountFromISR(), USART3->ISR); 
+		printf("t:%d\n", xTaskGetTickCountFromISR()); 
         LL_USART_ClearFlag_RTO(USART3);      /* Clear RTO line flag */
-		printf("r:%x, %x\n", USART3->ISR, USART3->RTOR);
-		//if(LL_USART_IsActiveFlag_ORE(USART3)) {
-		//	printf("------ore-------3\n");
-		//	LL_USART_ClearFlag_ORE(USART3);
-		//}
-		
-		rx_data_length = ARRAY_LEN(usart3_buffer) - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_5);
+		rx_data_length = ARRAY_LEN(at_buffer1) - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_5);
 		LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_5);
 		
 		// AT_BUFFER_SIZE < rx_data_length < MINIMUM_LENGTH
-		if (((rx_data_length >= AT_BUFFER_SIZE) || (rx_data_length < MINIMUM_LENGTH) || (at_task_handle == 0)) == 0) {
-			memcpy(at_buffer, usart3_buffer, rx_data_length);
-			at_buffer[rx_data_length]=0;
-			printf("u3:%s, at len=%d\n", at_buffer, rx_data_length);
-			osThreadFlagsSet(at_task_handle, AT_DATA_FLAG);
+		if (((rx_data_length >= AT_BUFFER_SIZE) || (rx_data_length < 2) || (at_task_handle == 0)) == 0) {
+			if (receive_buffer_index == 1) {
+				at_buffer1[rx_data_length]=0;
+				LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)at_buffer2);
+				LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)&USART3->RDR);
+				LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_5, ARRAY_LEN(at_buffer1));
+				receive_buffer_index = 2;
+				LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_5);
+				printf("u31:%s, at len=%d\n", at_buffer1, rx_data_length);
+				pxMessage = at_buffer1;
+				xQueueSendFromISR(at_queue_handle, &pxMessage, &xHigherPriorityTaskWoken);
+			} else {
+				at_buffer2[rx_data_length]=0;
+				LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)at_buffer1);
+				LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)&USART3->RDR);
+				LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_5, ARRAY_LEN(at_buffer1));
+				receive_buffer_index = 1;
+				LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_5);
+				printf("u32:%s, at len=%d\n", at_buffer2, rx_data_length);
+				pxMessage = at_buffer2;
+				xQueueSendFromISR(at_queue_handle, &pxMessage, &xHigherPriorityTaskWoken);
+			}
 		} else {
-			
+			LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)&USART3->RDR);
+			if (receive_buffer_index == 1) {
+				LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)at_buffer1);
+				receive_buffer_index = 1;
+			} else {
+				LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)at_buffer2);
+				receive_buffer_index = 2;
+			}
+			LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_5, ARRAY_LEN(at_buffer1));
+			LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_5);
+			printf("handle 0\n");
 		}
-		
-		LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)&USART3->RDR);
-		LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_5, (uint32_t)usart3_buffer);
-		LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_5, ARRAY_LEN(usart3_buffer));
-		LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_5);
-
     }
 }
 

@@ -45,7 +45,7 @@ action_result at_httpurl_content_download_action2(const char *command_buffer)
 
 int at_httpget_download_action1(void)
 {
-	printf("send get data\n");
+	printf("send get data1\n");
 	send_at_command("AT+QHTTPGET=80\r\n");
 	return 0;
 }
@@ -54,6 +54,8 @@ action_result at_httpget_download_action2(const char *command_buffer)
 {	
 	if (isCorrectCommand(command_buffer, "200") == SUCCESS) {
 		return ACTION_SUCCESS;
+	} else if(isCorrectCommand(command_buffer, "QHTTPGET") == SUCCESS) {
+		return ACTION_WAIT_AGAIN;;
 	} else {
 		return ACTION_FAILED;
 	}
@@ -118,7 +120,7 @@ action_result at_httpurl_content_file_action2(const char *command_buffer)
 
 int at_httpget_file_action1(void)
 {
-	printf("send get data\n");
+	printf("send get data2\n");
 	send_at_command("AT+QHTTPGET=80\r\n");
 	return 0;
 }
@@ -127,7 +129,9 @@ action_result at_httpget_file_action2(const char *command_buffer)
 {	
 	if (isCorrectCommand(command_buffer, "200") == SUCCESS) {
 		return ACTION_SUCCESS;
-	} else {
+	}  else if(isCorrectCommand(command_buffer, "QHTTPGET") == SUCCESS) {
+		return ACTION_WAIT_AGAIN;;
+	}  else {
 		return ACTION_FAILED;
 	}
 }

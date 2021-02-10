@@ -36,6 +36,7 @@
 #include "utils.h"
 #include "gpio.h"
 #include "data_saver.h"
+#include "queue.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -82,11 +83,20 @@ const osThreadAttr_t at_task_attributes = {
   .stack_size = 128 * 6
 };
 
+
+
 bool at_dealing_data = false;
 
 void at_task(void *argument);
 
 void reset_at_module(void); 
+
+xQueueHandle at_queue_handle;
+#define QUEUE_LENGTH    4
+#define ITEM_SIZE       sizeof( uint8_t* )
+uint8_t ucQueueStorageArea[ QUEUE_LENGTH * ITEM_SIZE ];
+static uint8_t* at_receive_address;
+static StaticQueue_t xStaticQueue;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -117,6 +127,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
+
+  at_queue_handle = xQueueCreateStatic( 4,  ITEM_SIZE, ucQueueStorageArea, &xStaticQueue);
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -219,7 +231,7 @@ void at_task(void *argument)
 {
 	init_at_module();
 	nbiot_fsm_state_index_t* current_index_pointer;
-	osStatus_t wait_result = osOK;
+	BaseType_t  queue_result = pdFALSE;
 	int reset_flag = 0;
 	int wait_again = 0;
 	int wait_time = 0;
@@ -236,10 +248,11 @@ void at_task(void *argument)
 			wait_time = current_index_pointer->fsm_state->wait_time;
 		}
 		
-		wait_result = osThreadFlagsWait(AT_WAIT_FLAG, osFlagsWaitAny, wait_time);
+		queue_result = xQueueReceive(at_queue_handle, &at_receive_address, wait_time);
+		//wait_result = osThreadFlagsWait(AT_WAIT_FLAG, osFlagsWaitAny, wait_time);
 		//if time out , retry tyrcnt times.
-		printf("wait result = %d\n", wait_result);
-		if (wait_result == osErrorTimeout) {
+		printf("qresult = %ld\n", queue_result);
+		if (queue_result == pdFALSE) {
 			if (current_index_pointer->trycnt < current_index_pointer->fsm_state->try_cnt) {
 				current_index_pointer->trycnt++;
 				continue;
@@ -247,14 +260,11 @@ void at_task(void *argument)
 				reset_flag = 1;
 				continue;
 			}
-		} else if (wait_result == AT_RESET_FLAG) {
-			reset_flag = 0;
-			continue;
-		}
+		} 
 		
 		//const char* command = get_at_command_from_buffer((char*)at_buffer);
-		printf("buffer:%s\n", at_buffer);
-		action_result action2_result = current_index_pointer->fsm_state->action2((char*)at_buffer);
+		printf("buffer:%s\n", at_receive_address);
+		action_result action2_result = current_index_pointer->fsm_state->action2((char*)at_receive_address);
 		
 		if (action2_result == ACTION_REPEAT) {
 			continue;

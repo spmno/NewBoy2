@@ -79,5 +79,6 @@ typedef struct
     const at_fsm_state_t *fsm_state; 
 } nbiot_fsm_state_index_t;
 
+
 #endif
 

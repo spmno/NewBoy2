@@ -43,7 +43,7 @@ action_result at_httpurl_version_add_action2(const char *command_buffer)
 int at_httpget_version_action1(void)
 {
 	printf("send get v\n");
-	HAL_Delay(1000);
+	HAL_Delay(100);
 	send_at_command("AT+QHTTPGET=80\r\n");
 	return 0;
 }
@@ -52,6 +52,8 @@ action_result at_httpget_version_action2(const char *command_buffer)
 {	
 	if (isCorrectCommand(command_buffer, "200") == SUCCESS) {
 		return ACTION_SUCCESS;
+	} else if (isCorrectCommand(command_buffer, "QHTTPGET") == SUCCESS) {
+		return ACTION_WAIT_AGAIN; 
 	} else {
 		return ACTION_FAILED;
 	}
